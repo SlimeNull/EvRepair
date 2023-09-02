@@ -21,7 +21,9 @@ namespace EvRepair
             ConsoleInput.Key("按任意键继续...");
             string? tempPath = Path.GetTempPath();
 
-            if (ConsoleInput.YesOrNo("修复视频时, 需要生成一些临时的文件, 默认生成在用户临时目录, 要更改吗?", false))
+            bool foolMode = ConsoleInput.YesOrNo("使用傻瓜操作模式吗? 傻瓜模式下, 你只需要拖文件就好了, 其他的程序自动完成.", true);
+
+            if (!foolMode && ConsoleInput.YesOrNo("修复视频时, 需要生成一些临时的文件, 默认生成在用户临时目录, 要更改吗?", false))
                 tempPath = ConsoleInput.DirectoryPath("输入一个目录: ");
 
             string? ffmpegPath = PathUtils.FindExecutableInPath("ffmpeg.exe");
@@ -32,7 +34,7 @@ namespace EvRepair
 
             if (ffmpegPath == null)
             {
-                int choice = ConsoleInput.SelectIndex("在你的电脑上没找到 ffmpeg, 下面进行什么?", "使用本程序内嵌的 ffmpeg", "自己选择一个程序作为 ffmpeg 使用");
+                int choice = foolMode ? 0 : ConsoleInput.SelectIndex("在你的电脑上没找到 ffmpeg, 下面进行什么?", "使用本程序内嵌的 ffmpeg", "自己选择一个程序作为 ffmpeg 使用");
                 if (choice == 0)
                     extractFFmpeg = true;
 
@@ -46,7 +48,7 @@ namespace EvRepair
 
             if (recoverMp4Path == null)
             {
-                int choice = ConsoleInput.SelectIndex("在你的电脑上没找到 recover_mp4.exe, 下面进行什么?", "使用本程序内嵌的 recover_mp4", "自己选择一个程序作为 recover_mp4 使用");
+                int choice = foolMode ? 0 : ConsoleInput.SelectIndex("在你的电脑上没找到 recover_mp4.exe, 下面进行什么?", "使用本程序内嵌的 recover_mp4", "自己选择一个程序作为 recover_mp4 使用");
                 if (choice == 0)
                     extractRecoverMp4 = true;
 
