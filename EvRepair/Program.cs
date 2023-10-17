@@ -98,7 +98,16 @@ namespace EvRepair
             Console.WriteLine("将音视频流重新拼接为视频...");
             string recoveredVideo = PathUtils.ChangeFileNameWithoutExtension(brokenVideo, Path.GetFileNameWithoutExtension(brokenVideo) + "_recovered");
 
-            ExecuteAndRedirectOutput(ffmpegPath, "-r", $"{fps}", "-i", recoveredH264, "-i", recoveredAAC, "-bsf:a", "aac_adtstoasc", "-c:v", "copy", "-c:a", "copy", recoveredVideo);
+            FileInfo recoveredAACInfo = new FileInfo(recoveredAAC);
+
+            if (recoveredAACInfo.Length != 0)
+            {
+                ExecuteAndRedirectOutput(ffmpegPath, "-r", $"{fps}", "-i", recoveredH264, "-i", recoveredAAC, "-bsf:a", "aac_adtstoasc", "-c:v", "copy", "-c:a", "copy", recoveredVideo);
+            }
+            else
+            {
+                ExecuteAndRedirectOutput(ffmpegPath, "-r", $"{fps}", "-i", recoveredH264, "-c:v", "copy", recoveredVideo);
+            }
 
             if (!File.Exists(recoveredVideo))
             {
@@ -117,8 +126,13 @@ namespace EvRepair
             if (extractRecoverMp4)
                 File.Delete(recoverMp4Path);
 
+
             Console.WriteLine($"恢复完成了, 已将恢复的视频保存到以下文件:");
             Console.WriteLine($"  {recoveredVideo}");
+            Console.WriteLine();
+
+            if (recoveredAACInfo.Length == 0)
+                Console.WriteLine("提示, 音频流已丢失, 恢复的视频中不包含声音");
 
             ConsoleInput.Key("按任意键继续");
         }
