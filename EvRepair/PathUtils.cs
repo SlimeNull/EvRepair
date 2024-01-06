@@ -30,9 +30,16 @@ namespace EvRepair
 
             foreach (var path in values.Split(Path.PathSeparator))
             {
-                var fullPath = Path.Combine(path, fileName);
-                if (File.Exists(fullPath))
-                    return fullPath;
+                try
+                {
+                    var fullPath = Path.Combine(path, fileName);
+                    if (File.Exists(fullPath))
+                        return fullPath;
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine($"Path.Combine 错误  Path:\"{path}\"  FileName:{fileName}\n{e}");
+                }
             }
 
             return null;
